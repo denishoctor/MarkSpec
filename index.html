@@ -1,0 +1,415 @@
+<!doctype html>
+
+<style type="text/css">
+.markspec {
+margin-bottom:12px;
+padding:12px;
+}
+
+.markspec h1 {
+margin-top:0;
+}
+
+.markspec ul,.markgroup ul,question ul {
+margin:6px 6px 0;
+}
+
+.markspec li,.markgroup,.question {
+background-image:none;
+list-style:none outside none;
+}
+
+.markspec label {
+display:block;
+float:left;
+text-align:right;
+width:80px;
+margin:3px 0 0;
+}
+
+.markspec input,.markspec textarea {
+margin:0 0 12px 18px;
+padding:2px;
+}
+
+.markspec input {
+width:225px;
+}
+
+.markspec textarea {
+height:60px;
+width:300px;
+}
+
+.markgroup {
+border:1px solid #D9D9D9;
+margin-bottom:12px;
+background-color:#FFF;
+padding:0 0 12px;
+}
+
+.markgroup .header h2 {
+display:inline;
+font-size:14px;
+}
+
+.actions {
+float:right;
+position:relative;
+top:2px;
+}
+
+.actions a {
+float:left;
+margin:0 0 0 12px;
+}
+
+.actions label {
+font-weight:500;
+width:auto;
+margin:0 0 0 12px;
+}
+
+.actions input {
+width:2em;
+position:relative;
+top:-4px;
+margin-left:6px;
+cursor:text;
+margin-bottom:0;
+}
+
+.items {
+min-height:38px;
+_height:auto !important;
+}
+
+.item,.item-highlight {
+background-color:#EAEAEA;
+border:1px solid #D9D9D9;
+cursor:move;
+min-height:18px;
+overflow:hidden;
+border-radius:5px;
+-moz-border-radius:5px;
+-webkit-border-radius:5px;
+margin:12px 12px 0;
+padding:6px 6px 2px;
+}
+
+.item-highlight {
+background:#F9F9E5;
+height:18px;
+}
+
+.item h3 {
+float:left;
+font-size:14px;
+width:480px;
+margin:0;
+}
+
+.markspec .header {
+background-color:#EAEAEA;
+padding:8px 6px;
+}
+
+.markspec .nomargin {
+margin:0 !important;
+}
+
+.markspec .hide {
+display:none !important;
+}
+</style>
+
+<div class="markspec">
+    <h1>Mark Specification 2</h1>
+    <ul>
+        <li><label for="name">Name</label> <input id="name" type="text" value="CF Embeded"></li>
+        <li><label for="description">Description</label> <textarea cols="20" row="5" id="description">CF Embeded</textarea></li>
+    </ul>
+
+    <a href="javascript://" id="addgroup">Add Group</a>
+</div>
+
+
+
+<script type="text/template" id="markspec-template">
+    <h1>Mark Specification</h1>
+    <ul>
+        <li><label for="name">Name</label> <input id="name" type="text" value="<%= name %>"></li>
+        <li><label for="description">Description</label> <textarea cols="20" row="5" id="description"><%= description %></textarea></li>
+    </ul>
+
+    <a href="javascript://" id="addgroup">Add Group</a>
+</script>
+
+<script type="text/template" id="group-template">
+	<li>
+	    <h3><%= name %></h3>
+	    <span class="actions">
+	        <a href="javascript://" class="toogleitem">
+	            deactivate
+	        </a>
+	        <label for="item_205_input">Criteria:</label>
+	        
+	        <input id="item_205_input" class="item_criteria" maxlength="3" type="text" <%= criteriagroup_id ? 'value="' + criteriagroup_id + '"' : ''%>
+	    </span>
+	</li>
+</script>
+
+<script type="text/template" id="item-template">
+	<ul id="markgroups" class="markgroups">
+		<!-- Loop -->
+		<li class="markgroup markspec_models_markgroup_17">
+		    <div class="header">
+			    <h2>Task 2 - Testing TalkBack - Mark Spec Group 1</h2>
+		        <span class="actions">
+		            <a href="javascript://" class="editgroup">edit</a>
+		            <a href="javascript://" class="removegroup hide">remove</a>
+		            <label for="markgroup_17_input">Criteria:</label>
+		            <input id="markgroup_17_input" class="markgroup_criteria" maxlength="3" type="text" value="1">
+		        </span>
+		    </div>
+		    <!-- Items include, loop? -->
+	    </li>
+    </ul>
+</script>
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
+<script src="js/underscore.js"></script>
+<script src="js/backbone.js"></script>
+<script src="js/markspecJSON.js"></script>
+<script src="js/routes.js"></script>
+<script src="js/models.js"></script>
+<script src="js/collections.js"></script>
+<script src="js/views.js"></script>
+<script>
+	var Markspec = Backbone.Model.extend({
+		initialize: function() {
+			
+		},
+		change: function(event, c, d) {
+			
+			console.log('changed:')
+			console.log(event)
+			console.log(c)
+			console.log(d)
+		}
+	});
+	
+	var Group = Backbone.Model.extend({
+		initialize: function() {
+			
+		}
+	});
+	
+	var MetaView = Backbone.View.extend({
+		tagName: "div",
+		
+		className: "markspec",
+		
+		template  : _.template($('#markspec-template').html()),
+		
+		events: {
+			"change #name":          		"update",
+			"change #description":   		"update",
+		},
+		
+		initialize: function() {
+			$(document.body).append(this.el);			
+			_.bindAll(this, "render", "update");
+		},
+		
+		update: function(event) {
+			this.model.set({
+				name: this.$('#name').val(),
+				description: this.$('#description').val()
+			});
+			console.log('update:')
+			console.log(this.model.attributes)
+			console.log(this)
+		},
+		
+		render: function() {
+			$(this.el).html(this.template(this.model.toJSON()));
+			return this;
+		}
+	});
+	
+	var GroupView = Backbone.View.extend({
+		tagName: "ul",
+		
+		className: "group",
+		
+		template  : _.template($('#group-template').html()),
+		
+		events: {
+			"click .editgroup":          		"rename",
+			"click .removegroup":   			"remove",
+			"change .markgroup_criteria":   	"updateCriteria",
+		},
+		
+		initialize: function() {
+			console.log(this.el)
+			$('.markspec').append(this.el);			
+			_.bindAll(this, "render", "rename", "remove", "updateCriteria");
+		},
+		
+		rename: function(event) {
+			
+		},
+		
+		remove: function(event) {
+			
+		},
+		
+		updateCriteria: function(event) {
+			
+		},
+		
+		render: function() {
+			console.log('render me:')
+			console.log(this.el)
+			console.log(this.model.toJSON())
+			$(this.el).html(this.template(this.model.toJSON()));
+			return this;
+		}
+	});
+	
+	
+	markspecInstance = new Markspec(markspecJSON);
+	
+	groupInstance = new Group(markspecJSON.markgroups[0]);
+	
+	markspecMeta = new MetaView({
+		el: $('.markspec')[0],
+		model: markspecInstance
+	});
+	
+	markspecMeta.render();
+	
+	group = new GroupView({
+		model: groupInstance
+	});
+	group.render();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <Markspec> -->
+	
+	<!--
+	<div class="markspec">
+	    <h1>Mark Specification</h1>
+	    <ul>
+	        <li><label for="name">Name</label> <input id="name" class="testie" type="text" value="Task 2 - Testing TalkBack - Mark Spec"></li>
+	        <li><label for="description">Description</label> <textarea cols="20" row="5" id="description"></textarea></li>
+	    </ul>
+	
+	    <a href="javascript://" class="addgroup">Add Group</a>
+		<ul id="markgroups" class="markgroups">
+			<li class="markgroup markspec_models_markgroup_17">
+			    
+			    <div class="header">
+				    <h2>Task 2 - Testing TalkBack - Mark Spec Group 1</h2>
+			        <span class="actions">
+			            <a href="javascript://" class="editgroup">edit</a>
+			            <a href="javascript://" class="removegroup hide">remove</a>
+			            <label for="markgroup_17_input">Criteria:</label>
+			            <input id="markgroup_17_input" class="markgroup_criteria" maxlength="3" type="text" value="1">
+			        </span>
+			    </div>
+			    
+			    <ul class="items ui-sortable" style="">
+					<li class="item markspec_models_item_200" style="">
+					    <h3>10047. Image Source A: People Celebrating. Tell me about a celebration in your country.</h3>
+					    <span class="actions">
+					        <a href="javascript://" class="toogleitem">
+					            deactivate
+					        </a>
+					        <label for="item_200_input">Criteria:</label>
+					        <input id="item_200_input" class="item_criteria" maxlength="3" type="text" value="">
+					    </span>
+					</li>
+					
+					<li class="item markspec_models_item_201" style="">
+					    <h3>10048. Image Source A: People Celebrating. Why is it important to celebrate special occasions with family or friends?</h3>
+					    <span class="actions">
+					        <a href="javascript://" class="toogleitem">
+					            deactivate
+					        </a>
+					        <label for="item_201_input">Criteria:</label>
+					        <input id="item_201_input" class="item_criteria" maxlength="3" type="text" value="">
+					    </span>
+					</li>
+					
+					<li class="item markspec_models_item_202" style="">
+					    <h3>10049. Image Source B: Shopping. Describe this picture.</h3>
+					    <span class="actions">
+					        <a href="javascript://" class="toogleitem">
+					            deactivate
+					        </a>
+					        <label for="item_202_input">Criteria:</label>
+					        <input id="item_202_input" class="item_criteria" maxlength="3" type="text" value="">
+					    </span>
+					</li>
+					
+					<li class="item markspec_models_item_203" style="">
+					    <h3>10046. Image Source A: People Celebrating. Describe this picture.</h3>
+					    <span class="actions">
+					        <a href="javascript://" class="toogleitem">
+					            deactivate
+					        </a>
+					        <label for="item_203_input">Criteria:</label>
+					        <input id="item_203_input" class="item_criteria" maxlength="3" type="text" value="">
+					    </span>
+					</li>
+					
+					<li class="item markspec_models_item_204" style="">
+					    <h3>10050. Image Source B: Shopping. Tell me about a time when you went shopping.</h3>
+					    <span class="actions">
+					        <a href="javascript://" class="toogleitem">
+					            deactivate
+					        </a>
+					        <label for="item_204_input">Criteria:</label>
+					        <input id="item_204_input" class="item_criteria" maxlength="3" type="text" value="">
+					    </span>
+					</li>
+					
+					<li class="item markspec_models_item_205" style="">
+					    <h3>10051. Image Source B: Shopping. How do you think the way we shop has changed over the last 100 years.</h3>
+					    <span class="actions">
+					        <a href="javascript://" class="toogleitem">
+					            deactivate
+					        </a>
+					        <label for="item_205_input">Criteria:</label>
+					        <input id="item_205_input" class="item_criteria" maxlength="3" type="text" value="">
+					    </span>
+					</li>
+			    </ul>
+			</li>
+	    </ul>
+	</div>
+	-->
