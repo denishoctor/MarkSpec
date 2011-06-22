@@ -124,28 +124,40 @@ display:none !important;
 </style>
 
 <div class="markspec">
-    <h1>Mark Specification 2</h1>
-    <ul>
+    <h1>Mark Specification</h1>
+    <ul class="markspec-meta">
         <li><label for="name">Name</label> <input id="name" type="text" value="CF Embeded"></li>
         <li><label for="description">Description</label> <textarea cols="20" row="5" id="description">CF Embeded</textarea></li>
     </ul>
 
     <a href="javascript://" id="addgroup">Add Group</a>
+    
+    <div class="markspecgroups"></div>
 </div>
 
 
 
 <script type="text/template" id="markspec-template">
-    <h1>Mark Specification</h1>
-    <ul>
-        <li><label for="name">Name</label> <input id="name" type="text" value="<%= name %>"></li>
-        <li><label for="description">Description</label> <textarea cols="20" row="5" id="description"><%= description %></textarea></li>
-    </ul>
-
-    <a href="javascript://" id="addgroup">Add Group</a>
+    <li><label for="name">Name</label> <input id="name" type="text" value="<%= name %>"></li>
+    <li><label for="description">Description</label> <textarea cols="20" row="5" id="description"><%= description %></textarea></li>
 </script>
 
 <script type="text/template" id="group-template">
+	<li class="markgroup markspec_models_markgroup_17">
+	    <div class="header">
+		    <h2><%= name %></h2>
+	        <span class="actions">
+	            <a href="javascript://" class="editgroup">edit</a>
+	            <a href="javascript://" class="removegroup hide">remove</a>
+	            <label for="markgroup_17_input">Criteria:</label>
+	            <input id="markgroup_17_input" class="markgroup_criteria" maxlength="3" type="text" <%= criteriagroup_id ? 'value="' + criteriagroup_id + '"' : ''%>>
+	        </span>
+	    </div>
+	    <!-- Items include, loop? -->
+    </li>
+</script>
+
+<script type="text/template" id="item-template">
 	<li>
 	    <h3><%= name %></h3>
 	    <span class="actions">
@@ -154,66 +166,42 @@ display:none !important;
 	        </a>
 	        <label for="item_205_input">Criteria:</label>
 	        
-	        <input id="item_205_input" class="item_criteria" maxlength="3" type="text" <%= criteriagroup_id ? 'value="' + criteriagroup_id + '"' : ''%>
+	        <input id="item_205_input" class="item_criteria" maxlength="3" type="text" <%= criteriagroup_id ? 'value="' + criteriagroup_id + '"' : ''%>>
 	    </span>
 	</li>
 </script>
 
-<script type="text/template" id="item-template">
-	<ul id="markgroups" class="markgroups">
-		<!-- Loop -->
-		<li class="markgroup markspec_models_markgroup_17">
-		    <div class="header">
-			    <h2>Task 2 - Testing TalkBack - Mark Spec Group 1</h2>
-		        <span class="actions">
-		            <a href="javascript://" class="editgroup">edit</a>
-		            <a href="javascript://" class="removegroup hide">remove</a>
-		            <label for="markgroup_17_input">Criteria:</label>
-		            <input id="markgroup_17_input" class="markgroup_criteria" maxlength="3" type="text" value="1">
-		        </span>
-		    </div>
-		    <!-- Items include, loop? -->
-	    </li>
-    </ul>
-</script>
 
 
 
-
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/themes/base/jquery-ui.css" type="text/css" media="all">
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
+
 <script src="js/underscore.js"></script>
 <script src="js/backbone.js"></script>
+
 <script src="js/markspecJSON.js"></script>
+
 <script src="js/routes.js"></script>
 <script src="js/models.js"></script>
 <script src="js/collections.js"></script>
 <script src="js/views.js"></script>
+
 <script>
 	var Markspec = Backbone.Model.extend({
-		initialize: function() {
-			
-		},
-		change: function(event, c, d) {
-			
-			console.log('changed:')
-			console.log(event)
-			console.log(c)
-			console.log(d)
-		}
-	});
-	
-	var Group = Backbone.Model.extend({
-		initialize: function() {
-			
+		initialize: function() {},
+		
+		change: function(event) {
+			console.log('changed')
 		}
 	});
 	
 	var MetaView = Backbone.View.extend({
-		tagName: "div",
+		tagName: "ul",
 		
-		className: "markspec",
+		className: "markspec-meta",
 		
 		template  : _.template($('#markspec-template').html()),
 		
@@ -222,8 +210,7 @@ display:none !important;
 			"change #description":   		"update",
 		},
 		
-		initialize: function() {
-			$(document.body).append(this.el);			
+		initialize: function() {		
 			_.bindAll(this, "render", "update");
 		},
 		
@@ -232,21 +219,38 @@ display:none !important;
 				name: this.$('#name').val(),
 				description: this.$('#description').val()
 			});
-			console.log('update:')
-			console.log(this.model.attributes)
-			console.log(this)
+			console.log('update')
 		},
 		
 		render: function() {
 			$(this.el).html(this.template(this.model.toJSON()));
 			return this;
 		}
+	});	
+	
+	markspecInstance = new Markspec(markspecJSON);
+	
+	console.log(markspecInstance)
+	
+	markspecMeta = new MetaView({
+		el: $('.markspec-meta')[0],
+		model: markspecInstance
 	});
 	
+	markspecMeta.render();
+	
+	
+	
+	
+	
+	var Group = Backbone.Model.extend({
+		initialize: function() {}
+	});	
+	
 	var GroupView = Backbone.View.extend({
-		tagName: "ul",
+		tagName: "li",
 		
-		className: "group",
+		className: "markgroup",
 		
 		template  : _.template($('#group-template').html()),
 		
@@ -257,43 +261,22 @@ display:none !important;
 		},
 		
 		initialize: function() {
-			console.log(this.el)
-			$('.markspec').append(this.el);			
-			_.bindAll(this, "render", "rename", "remove", "updateCriteria");
-		},
-		
-		rename: function(event) {
-			
-		},
-		
-		remove: function(event) {
-			
-		},
-		
-		updateCriteria: function(event) {
-			
+			$('.markspecgroups').append(this.el);			
+			_.bindAll(this, "render");
 		},
 		
 		render: function() {
-			console.log('render me:')
-			console.log(this.el)
-			console.log(this.model.toJSON())
 			$(this.el).html(this.template(this.model.toJSON()));
 			return this;
 		}
 	});
-	
-	
-	markspecInstance = new Markspec(markspecJSON);
-	
-	groupInstance = new Group(markspecJSON.markgroups[0]);
-	
-	markspecMeta = new MetaView({
-		el: $('.markspec')[0],
-		model: markspecInstance
+		
+   
+	var GroupCollection = Backbone.Collection.extend({
+		model: Group
 	});
 	
-	markspecMeta.render();
+	groupInstance = new Group(markspecJSON.markgroups[0]);
 	
 	group = new GroupView({
 		model: groupInstance
